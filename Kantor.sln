@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35514.174 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KantorWPF", "KantorWPF\KantorWPF.csproj", "{48DC72A0-066C-40D6-A857-6C4D14D2384A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KantorLogic", "KantorLogic\KantorLogic.csproj", "{5E1E7BE5-700C-494F-825B-4556B5E39C6F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{48DC72A0-066C-40D6-A857-6C4D14D2384A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48DC72A0-066C-40D6-A857-6C4D14D2384A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48DC72A0-066C-40D6-A857-6C4D14D2384A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E1E7BE5-700C-494F-825B-4556B5E39C6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E1E7BE5-700C-494F-825B-4556B5E39C6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E1E7BE5-700C-494F-825B-4556B5E39C6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E1E7BE5-700C-494F-825B-4556B5E39C6F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
