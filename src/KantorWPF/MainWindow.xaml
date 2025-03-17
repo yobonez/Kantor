@@ -7,6 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Label Content="Witaj, kliencie kantoru, czy coś idk" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="43" Width="372" FontSize="24"/>
+        <Label Content="Aktualne średnie kursy wg NBP:" HorizontalAlignment="Left" Margin="10,53,0,0" VerticalAlignment="Top" Height="30" Width="186"/>
+        <DataGrid x:Name="MidExchangeValues" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="10,88,10,44"/>
 
     </Grid>
 </Window>

@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35514.174 d17.12
+VisualStudioVersion = 17.12.35514.174
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KantorWPF", "KantorWPF\KantorWPF.csproj", "{48DC72A0-066C-40D6-A857-6C4D14D2384A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4C53DC39-D98F-4132-95B7-49C0839D3942}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KantorLogic", "KantorLogic\KantorLogic.csproj", "{5E1E7BE5-700C-494F-825B-4556B5E39C6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KantorLogic", "src\KantorLogic\KantorLogic.csproj", "{FB80B594-1180-4B07-BAD8-233881BF994A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KantorWPF", "src\KantorWPF\KantorWPF.csproj", "{394A5E04-8D6F-4DCF-A841-523087CC2F37}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KantorTestowanko", "src\KantorTestowanko\KantorTestowanko.csproj", "{B712EB4E-CF37-4179-BF11-16832E55AF6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +17,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{48DC72A0-066C-40D6-A857-6C4D14D2384A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{48DC72A0-066C-40D6-A857-6C4D14D2384A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{48DC72A0-066C-40D6-A857-6C4D14D2384A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{48DC72A0-066C-40D6-A857-6C4D14D2384A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5E1E7BE5-700C-494F-825B-4556B5E39C6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5E1E7BE5-700C-494F-825B-4556B5E39C6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5E1E7BE5-700C-494F-825B-4556B5E39C6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5E1E7BE5-700C-494F-825B-4556B5E39C6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB80B594-1180-4B07-BAD8-233881BF994A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB80B594-1180-4B07-BAD8-233881BF994A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB80B594-1180-4B07-BAD8-233881BF994A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB80B594-1180-4B07-BAD8-233881BF994A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{394A5E04-8D6F-4DCF-A841-523087CC2F37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{394A5E04-8D6F-4DCF-A841-523087CC2F37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{394A5E04-8D6F-4DCF-A841-523087CC2F37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{394A5E04-8D6F-4DCF-A841-523087CC2F37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B712EB4E-CF37-4179-BF11-16832E55AF6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B712EB4E-CF37-4179-BF11-16832E55AF6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B712EB4E-CF37-4179-BF11-16832E55AF6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B712EB4E-CF37-4179-BF11-16832E55AF6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
