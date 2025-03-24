@@ -1,12 +1,7 @@
 ﻿using KantorLogic.models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
-using System.Net.Http.Formatting;
-using System.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KantorLogic.api;
 
@@ -50,9 +45,12 @@ public class DataAccess
                          : $"exchangerates/tables/{tableCode}";
 
         string result = string.Empty;
+
+        string day = (date.Day < 10) ? "0" + date.Day.ToString() : date.Day.ToString();
+        string month = (date.Month < 10) ? "0" + date.Month.ToString() : date.Month.ToString();
         string dateForQuery = date.Year.ToString() + '-' +
-                              date.Month.ToString() + '-' +
-                              date.Day.ToString() 
+                              month + '-' +
+                              day
                               ?? "today";
 
         result = _apiUrl + $"{subPath}/{dateForQuery}";
@@ -68,14 +66,19 @@ public class DataAccess
                          ? "cenyzlota"
                          : $"exchangerates/tables/{tableCode}";
         string result = string.Empty;
+
+        string dStart = (from.Day < 10) ? "0" + from.Day.ToString() : from.Day.ToString();
+        string mStart = (from.Month < 10) ? "0" + from.Month.ToString() : from.Month.ToString();
         string dateStartForQuery = from.Year.ToString() + '-' +
-                                   from.Month.ToString() + '-' +
-                                   from.Day.ToString()
+                                   mStart + '-' +
+                                   dStart
                                    ?? throw new Exception("Nie podano daty");
 
+        string dEnd = (to.Day < 10) ? "0" + to.Day.ToString() : to.Day.ToString();
+        string mEnd = (to.Month < 10) ? "0" + to.Month.ToString() : to.Month.ToString();
         string dateEndForQuery = to.Year.ToString() + '-' +
-                                 to.Month.ToString() + '-' +
-                                 to.Day.ToString()
+                                 mEnd + '-' +
+                                 dEnd
                                  ?? throw new Exception("Nie podano daty");
 
         result = _apiUrl + $"{subPath}/{dateStartForQuery}/{dateEndForQuery}";
@@ -86,7 +89,8 @@ public class DataAccess
     {
         foreach (string tableCode in tableCodes)
         {
-            HttpResponseMessage response = await _httpClient.GetAsync(BuildEndpointString(tableCode));
+            string endpoint = BuildEndpointString(tableCode);
+            HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 List<CurrencyTable> currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
@@ -96,38 +100,63 @@ public class DataAccess
 
         return currencyTables;
     }
-    //public async Task<List<CurrencyTable>> GetAllCurrencyTablesByDate(DateTime date)
-    //{
-    //    string strDate = date.Year.ToString() + '-' +
-    //                     date.Month.ToString() + '-' +
-    //                     date.Day.ToString();
-
-    //    foreach (string tableCode in tableCodes)
-    //    {
-    //        HttpResponseMessage response = await _httpClient.GetAsync(_apiUrl + $"exchangerates/tables/{tableCode}");
-    //        if (response.StatusCode == HttpStatusCode.OK)
-    //        {
-    //            List<CurrencyTable> currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
-    //            currencyTables.Add(currencyTableResponse[0]);
-    //        }
-    //    }
-    //    return currencyTables;
-    //}
-    public async Task<CurrencyTable> GetNewestCurrencyTable(string tableCode)
+    public async Task<CurrencyTable> GetCurrencyTableNewest(string tableCode)
     {
-        // nie wiem, czy to sie przyda...
-        //if (currencyTables.Count == 3)
-        //{
-        //    return (from currencyTable in currencyTables
-        //            where currencyTable.Table == tableCode
-        //            select currencyTable).FirstOrDefault();
-        //}
+        string endpoint = BuildEndpointString(tableCode);
 
-        HttpResponseMessage response = await _httpClient.GetAsync(BuildEndpointString(tableCode));
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
         List<CurrencyTable> currencyTableResponse = new();
         if (response.StatusCode == HttpStatusCode.OK)
             currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
+        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
 
         return currencyTableResponse[0];
     }
+    // to moze tez przeladowac?
+    //public async Task<CurrencyTable> GetCurrencyTableInDate(DateTime date)
+    //{
+    //    string endpoint = BuildEndpointString(tableCode);
+
+    //    HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+    //    List<CurrencyTable> currencyTableResponse = new();
+    //    if (response.StatusCode == HttpStatusCode.OK)
+    //        currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
+    //    else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+
+    //    return currencyTableResponse[0];
+    //}
+    public async Task<List<CurrencyTable>> GetAllCurrencyTablesInDate(DateTime date)
+    {
+        foreach (string tableCode in tableCodes)
+        {
+            string endpoint = BuildEndpointString(tableCode, date);
+
+            HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                List<CurrencyTable> currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
+                currencyTables.Add(currencyTableResponse[0]);
+            }
+            else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+        }
+        return currencyTables;
+    }
+    public async Task<List<CurrencyTable>> GetAllCurrencyTablesInDateRange(DateTime from, DateTime to)
+    {
+        foreach (string tableCode in tableCodes)
+        {
+            string endpoint = BuildEndpointString(tableCode, from, to);
+
+            HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                List<CurrencyTable> currencyTablesResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
+                foreach(CurrencyTable currencyTable in currencyTablesResponse)
+                    { currencyTables.Add(currencyTable); }
+            }
+            else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+        }
+        return currencyTables;
+    }
+
 }
