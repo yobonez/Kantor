@@ -1,7 +1,5 @@
 ﻿using KantorLogic.models;
-using System.ComponentModel.DataAnnotations;
 using System.Net;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KantorLogic.api;
 
@@ -9,27 +7,34 @@ public class DataAccess
 {
     private HttpClient _httpClient;
     private readonly string _apiUrl = "https://api.nbp.pl/api/";
-    private List<CurrencyTable> currencyTables;
+    private List<Currencies> currencyTables;
 
     private readonly string[] tableCodes = { "A", "B", "C" };
     public DataAccess()
     {
         _httpClient = new HttpClient();
-        currencyTables = new List<CurrencyTable>();
+        currencyTables = new List<Currencies>();
     }
+
+    // this code does too much, move BuildEndpointString to different class called "EndpointStringBuilder"
+    // or something idk
     private string BuildEndpointString(string tableCode, 
                                        int topCount = 0,
-                                       string currencyCode = null)
+                                       string? currencyCode = null)
     {
-        string result = string.Empty;
+        string tablesRates = (currencyCode != null) ? "rates" : "tables";
         string subPath = (tableCode == "gold") 
                          ? "cenyzlota" 
-                         : $"exchangerates/tables/{tableCode}";
+                         : $"exchangerates/{tablesRates}/{tableCode}";
+
+        string result = string.Empty;
 
         if (currencyCode != null && tableCode != "gold")
         {
             if (topCount > 0) result = _apiUrl + $"{subPath}/{currencyCode}/last/{topCount}";
             else result = _apiUrl + $"{subPath}/{currencyCode}";
+
+            return result;
         }
         if (topCount > 0) result = _apiUrl + $"{subPath}/last/{topCount}";
         else result = _apiUrl + $"{subPath}";
@@ -38,11 +43,12 @@ public class DataAccess
     }
     private string BuildEndpointString(string tableCode,
                                        DateTime date,
-                                       string currencyCode = null)
+                                       string? currencyCode = null)
     {
+        string tablesRates = (currencyCode != null) ? "rates" : "tables";
         string subPath = (tableCode == "gold")
                          ? "cenyzlota"
-                         : $"exchangerates/tables/{tableCode}";
+                         : $"exchangerates/{tablesRates}/{tableCode}";
 
         string result = string.Empty;
 
@@ -52,6 +58,8 @@ public class DataAccess
                               month + '-' +
                               day
                               ?? "today";
+        if (currencyCode != null)
+        { result = _apiUrl + $"{subPath}/{currencyCode}/{dateForQuery}"; return result; }
 
         result = _apiUrl + $"{subPath}/{dateForQuery}";
 
@@ -60,11 +68,13 @@ public class DataAccess
     private string BuildEndpointString(string tableCode,
                                        DateTime from, 
                                        DateTime to,
-                                       string currencyCode = null)
+                                       string? currencyCode = null)
     {
+        string tablesRates = (currencyCode != null) ? "rates" : "tables";
         string subPath = (tableCode == "gold")
                          ? "cenyzlota"
-                         : $"exchangerates/tables/{tableCode}";
+                         : $"exchangerates/{tablesRates}/{tableCode}";
+
         string result = string.Empty;
 
         string dStart = (from.Day < 10) ? "0" + from.Day.ToString() : from.Day.ToString();
@@ -81,11 +91,90 @@ public class DataAccess
                                  dEnd
                                  ?? throw new Exception("Nie podano daty");
 
+        if (currencyCode != null)
+        { result = _apiUrl + $"{subPath}/{currencyCode}/{dateStartForQuery}/{dateEndForQuery}"; return result; }
+
         result = _apiUrl + $"{subPath}/{dateStartForQuery}/{dateEndForQuery}";
 
         return result;
     }
-    public async Task<List<CurrencyTable>> GetAllCurrencyTablesNewest()
+
+    // single currency retrieval
+    public async Task<CurrencyValues> GetCurrencyNewest(string tableCode, string? currencyCode)
+    {
+        string endpoint = BuildEndpointString(tableCode, currencyCode: currencyCode);
+
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        CurrencyValues currencyValuesResponse = new();
+        if (response.StatusCode == HttpStatusCode.OK)
+            currencyValuesResponse = await response.Content.ReadAsAsync<CurrencyValues>();
+        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+
+        return currencyValuesResponse;
+    }
+    public async Task<CurrencyValues> GetCurrencyNewestCount(string tableCode, string? currencyCode, int last)
+    {
+        string endpoint = BuildEndpointString(tableCode, currencyCode: currencyCode, topCount: last);
+
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        CurrencyValues currencyValuesResponse = new();
+        if (response.StatusCode == HttpStatusCode.OK)
+            currencyValuesResponse = await response.Content.ReadAsAsync<CurrencyValues>();
+        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+
+        return currencyValuesResponse;
+    }
+    public async Task<CurrencyValues> GetCurrencyInDate(string tableCode, string? currencyCode, DateTime date)
+    {
+        string endpoint = BuildEndpointString(tableCode, date, currencyCode: currencyCode);
+
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        CurrencyValues currencyValuesResponse = new();
+        if (response.StatusCode == HttpStatusCode.OK)
+            currencyValuesResponse = await response.Content.ReadAsAsync<CurrencyValues>();
+        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+
+        return currencyValuesResponse;
+    }
+    public async Task<CurrencyValues> GetCurrencyInDateRange(string tableCode, string? currencyCode, DateTime from, DateTime to)
+    {
+        string endpoint = BuildEndpointString(tableCode, from, to, currencyCode: currencyCode);
+
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        CurrencyValues currencyValuesResponse = new();
+        if (response.StatusCode == HttpStatusCode.OK)
+            currencyValuesResponse = await response.Content.ReadAsAsync<CurrencyValues>();
+        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+
+        return currencyValuesResponse;
+    }
+
+    // retrieval of multiple currencies
+    public async Task<Currencies> GetCurrencyTableNewest(string tableCode)
+    {
+        string endpoint = BuildEndpointString(tableCode);
+
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        List<Currencies> currencyTableResponse = new();
+        if (response.StatusCode == HttpStatusCode.OK)
+            currencyTableResponse = await response.Content.ReadAsAsync<List<Currencies>>();
+        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+
+        return currencyTableResponse[0];
+    }
+    public async Task<Currencies> GetCurrencyTableInDate(string tableCode, DateTime date)
+    {
+        string endpoint = BuildEndpointString(tableCode, date);
+
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        List<Currencies> currencyTableResponse = new();
+        if (response.StatusCode == HttpStatusCode.OK)
+            currencyTableResponse = await response.Content.ReadAsAsync<List<Currencies>>();
+        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+
+        return currencyTableResponse[0];
+    }
+    public async Task<List<Currencies>> GetAllCurrencyTablesNewest()
     {
         foreach (string tableCode in tableCodes)
         {
@@ -93,39 +182,26 @@ public class DataAccess
             HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                List<CurrencyTable> currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
+                List<Currencies> currencyTableResponse = await response.Content.ReadAsAsync<List<Currencies>>();
                 currencyTables.Add(currencyTableResponse[0]);
             }
         }
 
         return currencyTables;
     }
-    public async Task<CurrencyTable> GetCurrencyTableNewest(string tableCode)
+    public async Task<Currencies> GetCurrencyTableInDateRange(string tableCode, DateTime from, DateTime to)
     {
-        string endpoint = BuildEndpointString(tableCode);
+        string endpoint = BuildEndpointString(tableCode, from, to);
 
         HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        List<CurrencyTable> currencyTableResponse = new();
+        List<Currencies> currencyTableResponse = new();
         if (response.StatusCode == HttpStatusCode.OK)
-            currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
+            currencyTableResponse = await response.Content.ReadAsAsync<List<Currencies>>();
         else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
 
         return currencyTableResponse[0];
     }
-    // to moze tez przeladowac?
-    //public async Task<CurrencyTable> GetCurrencyTableInDate(DateTime date)
-    //{
-    //    string endpoint = BuildEndpointString(tableCode);
-
-    //    HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-    //    List<CurrencyTable> currencyTableResponse = new();
-    //    if (response.StatusCode == HttpStatusCode.OK)
-    //        currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
-    //    else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
-
-    //    return currencyTableResponse[0];
-    //}
-    public async Task<List<CurrencyTable>> GetAllCurrencyTablesInDate(DateTime date)
+    public async Task<List<Currencies>> GetAllCurrencyTablesInDate(DateTime date)
     {
         foreach (string tableCode in tableCodes)
         {
@@ -134,14 +210,14 @@ public class DataAccess
             HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                List<CurrencyTable> currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
+                List<Currencies> currencyTableResponse = await response.Content.ReadAsAsync<List<Currencies>>();
                 currencyTables.Add(currencyTableResponse[0]);
             }
             else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
         }
         return currencyTables;
     }
-    public async Task<List<CurrencyTable>> GetAllCurrencyTablesInDateRange(DateTime from, DateTime to)
+    public async Task<List<Currencies>> GetAllCurrencyTablesInDateRange(DateTime from, DateTime to)
     {
         foreach (string tableCode in tableCodes)
         {
@@ -150,8 +226,8 @@ public class DataAccess
             HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                List<CurrencyTable> currencyTablesResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
-                foreach(CurrencyTable currencyTable in currencyTablesResponse)
+                List<Currencies> currencyTablesResponse = await response.Content.ReadAsAsync<List<Currencies>>();
+                foreach(Currencies currencyTable in currencyTablesResponse)
                     { currencyTables.Add(currencyTable); }
             }
             else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);

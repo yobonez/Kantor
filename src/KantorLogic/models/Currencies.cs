@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace KantorLogic.models;
 
-public class CurrencyTable
+public class Currencies
 {
     public string Table { get; set; }
     public string No { get; set; }
-    public string EffectiveDate { get; set; }
+    public DateTime EffectiveDate { get; set; }
     public List<Rate> Rates { get; set; }
 }
