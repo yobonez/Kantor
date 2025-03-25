@@ -1,15 +1,7 @@
 ﻿namespace KantorLogic.models;
 
 
-public class GoldValues
-{
-    public List<GoldRate> CenaZlota { get; set; }
-}
-public class GoldRate
-{
-    public DateTime Data { get; set; }
-    public Decimal Cena { get; set; }
-}
+
 public class CurrencyValues
 {
     public string Table { get; set; }

@@ -148,6 +148,42 @@ public class DataAccess
 
         return currencyValuesResponse;
     }
+    public async Task<List<GoldRate>> GetGoldPriceNewest()
+    {
+        string endpoint = BuildEndpointString("gold");
+
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        List<GoldRate> goldRatesResponse = new();
+        if (response.StatusCode == HttpStatusCode.OK)
+            goldRatesResponse = await response.Content.ReadAsAsync<List<GoldRate>>();
+        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+
+        return goldRatesResponse;
+    }
+    public async Task<List<GoldRate>> GetGoldPriceInDate(DateTime date)
+    {
+        string endpoint = BuildEndpointString("gold", date);
+
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        List<GoldRate> goldValuesResponse = new();
+        if (response.StatusCode == HttpStatusCode.OK)
+            goldValuesResponse = await response.Content.ReadAsAsync<List<GoldRate>>();
+        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+
+        return goldValuesResponse;
+    }
+    public async Task<List<GoldRate>> GetGoldPriceInDateRange(DateTime from, DateTime to)
+    {
+        string endpoint = BuildEndpointString("gold", from, to);
+
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        List<GoldRate> goldValuesResponse = new();
+        if (response.StatusCode == HttpStatusCode.OK)
+            goldValuesResponse = await response.Content.ReadAsAsync<List<GoldRate>>();
+        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+
+        return goldValuesResponse;
+    }
 
     // retrieval of multiple currencies
     public async Task<Currencies> GetCurrencyTableNewest(string tableCode)
