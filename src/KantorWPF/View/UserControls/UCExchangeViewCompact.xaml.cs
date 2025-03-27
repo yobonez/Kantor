@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KantorWPF.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,8 @@ namespace KantorWPF.View.UserControls
     {
         public UCExchangeViewCompact()
         {
+            ConcreteCurrencyValuesViewModel vm = new();
+            DataContext = vm;
             InitializeComponent();
         }
     }

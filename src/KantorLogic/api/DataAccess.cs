@@ -101,50 +101,50 @@ public class DataAccess
 
     // TODO: refactoring
     // single currency retrieval
-    public async Task<CurrencyValues> GetCurrencyNewest(string tableCode, string? currencyCode)
+    public async Task<ConcreteCurrencyValues> GetCurrencyNewest(string tableCode, string? currencyCode)
     {
         string endpoint = BuildEndpointString(tableCode, currencyCode: currencyCode);
 
         HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        CurrencyValues currencyValuesResponse = new();
+        ConcreteCurrencyValues currencyValuesResponse = new();
         if (response.StatusCode == HttpStatusCode.OK)
-            currencyValuesResponse = await response.Content.ReadAsAsync<CurrencyValues>();
+            currencyValuesResponse = await response.Content.ReadAsAsync<ConcreteCurrencyValues>();
         else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
 
         return currencyValuesResponse;
     }
-    public async Task<CurrencyValues> GetCurrencyNewestCount(string tableCode, string? currencyCode, int last)
+    public async Task<ConcreteCurrencyValues> GetCurrencyNewestCount(string tableCode, string? currencyCode, int last)
     {
         string endpoint = BuildEndpointString(tableCode, currencyCode: currencyCode, topCount: last);
 
         HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        CurrencyValues currencyValuesResponse = new();
+        ConcreteCurrencyValues currencyValuesResponse = new();
         if (response.StatusCode == HttpStatusCode.OK)
-            currencyValuesResponse = await response.Content.ReadAsAsync<CurrencyValues>();
+            currencyValuesResponse = await response.Content.ReadAsAsync<ConcreteCurrencyValues>();
         else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
 
         return currencyValuesResponse;
     }
-    public async Task<CurrencyValues> GetCurrencyInDate(string tableCode, string? currencyCode, DateTime date)
+    public async Task<ConcreteCurrencyValues> GetCurrencyInDate(string tableCode, string? currencyCode, DateTime date)
     {
         string endpoint = BuildEndpointString(tableCode, date, currencyCode: currencyCode);
 
         HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        CurrencyValues currencyValuesResponse = new();
+        ConcreteCurrencyValues currencyValuesResponse = new();
         if (response.StatusCode == HttpStatusCode.OK)
-            currencyValuesResponse = await response.Content.ReadAsAsync<CurrencyValues>();
+            currencyValuesResponse = await response.Content.ReadAsAsync<ConcreteCurrencyValues>();
         else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
 
         return currencyValuesResponse;
     }
-    public async Task<CurrencyValues> GetCurrencyInDateRange(string tableCode, string? currencyCode, DateTime from, DateTime to)
+    public async Task<ConcreteCurrencyValues> GetCurrencyInDateRange(string tableCode, string? currencyCode, DateTime from, DateTime to)
     {
         string endpoint = BuildEndpointString(tableCode, from, to, currencyCode: currencyCode);
 
         HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        CurrencyValues currencyValuesResponse = new();
+        ConcreteCurrencyValues currencyValuesResponse = new();
         if (response.StatusCode == HttpStatusCode.OK)
-            currencyValuesResponse = await response.Content.ReadAsAsync<CurrencyValues>();
+            currencyValuesResponse = await response.Content.ReadAsAsync<ConcreteCurrencyValues>();
         else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
 
         return currencyValuesResponse;

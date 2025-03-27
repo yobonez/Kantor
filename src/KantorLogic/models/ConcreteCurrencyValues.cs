@@ -2,7 +2,7 @@
 
 
 
-public class CurrencyValues
+public class ConcreteCurrencyValues
 {
     public string Table { get; set; }
     public string Currency { get; set; }
