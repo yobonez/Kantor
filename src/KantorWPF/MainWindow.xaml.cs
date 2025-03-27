@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using KantorLogic.api;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +20,11 @@ namespace KantorWPF
         public MainWindow()
         {
             InitializeComponent();
+            LoadExchangeData();
+        }
+        public void LoadExchangeData()
+        {
+            
         }
     }
 }

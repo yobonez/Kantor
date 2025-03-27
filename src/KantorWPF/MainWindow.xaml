@@ -1,15 +1,20 @@
-﻿<Window x:Class="KantorWPF.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:KantorWPF"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" x:Class="KantorWPF.MainWindow"
         mc:Ignorable="d"
+        Style="{StaticResource MaterialDesignWindow}"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Label Content="Witaj, kliencie kantoru, czy coś idk" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="43" Width="372" FontSize="24"/>
-        <Label Content="Aktualne średnie kursy wg NBP:" HorizontalAlignment="Left" Margin="10,53,0,0" VerticalAlignment="Top" Height="30" Width="186"/>
-        <DataGrid x:Name="MidExchangeValues" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="10,88,10,44"/>
 
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.15*"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Label Content="Kantor" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24"/>
+        
     </Grid>
 </Window>

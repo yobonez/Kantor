@@ -99,6 +99,7 @@ public class DataAccess
         return result;
     }
 
+    // TODO: refactoring
     // single currency retrieval
     public async Task<CurrencyValues> GetCurrencyNewest(string tableCode, string? currencyCode)
     {
