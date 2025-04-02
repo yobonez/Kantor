@@ -10,15 +10,48 @@
         Style="{StaticResource MaterialDesignWindow}"
         Title="MainWindow" Height="450" Width="800">
 
-    <Grid>
+    <Window.Resources>
+        <Style x:Key="Body_Content_DataGrid_Centering"
+       TargetType="{x:Type DataGridCell}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}" Margin="5">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="5">
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.15*"/>
-            <RowDefinition/>
+            <RowDefinition Height="0.2*"/>
+            <RowDefinition Height="0.2*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Label Content="Kantor" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24"/>
-        <Grid x:Name="currenciesHolder" Grid.Row="1">
-            <Button Command="{Binding LoadCommand}" Content="Button" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <DataGrid Name="Currencies"  AutoGenerateColumns="False" ItemsSource="{Binding CurTable.Rates}" Margin="20">
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.2*"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <Label VerticalAlignment="Center">Tabela: </Label>
+                <ComboBox ItemsSource="{Binding AvailableTables}" SelectedItem="{Binding TableCode}"></ComboBox>
+            </StackPanel>
+            <Button Grid.Column="1" Command="{Binding LoadCommand}" 
+                Content="Wyświetl" 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Center"/>
+        </Grid>
+        <Grid x:Name="currenciesHolder" Grid.Row="2">
+            <DataGrid Name="Currencies" 
+                      IsReadOnly="True" 
+                      AutoGenerateColumns="False" 
+                      ItemsSource="{Binding CurTable.Rates}" 
+                      CellStyle="{StaticResource Body_Content_DataGrid_Centering}">
                 <DataGrid.Resources>
                     <med:ImageConverter x:Key="imageConverter" />
                 </DataGrid.Resources>
@@ -30,23 +63,34 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn>
+                    <DataGridTextColumn Binding="{Binding Code}" Header="Kod"></DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Currency}" Header="Nazwa"></DataGridTextColumn>
+                    <DataGridTemplateColumn Visibility="{Binding ColumnVisibility[0]}">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Image MaxHeight="20" Source="{Binding UpDownImage, Converter={StaticResource imageConverter}}"></Image>
+                                <Image MaxHeight="20" Source="{Binding UpDownBidImage, Converter={StaticResource imageConverter}}"></Image>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding Code}" Header="Kod"></DataGridTextColumn>
-                    <DataGridTextColumn Binding="{Binding Currency}" Header="Nazwa"></DataGridTextColumn>
-                    <DataGridTextColumn Binding="{Binding Bid}" Header="Kupno"></DataGridTextColumn>
-                    <DataGridTextColumn Binding="{Binding Ask}" Header="Sprzedaż"></DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Bid}" Header="Kupno" Visibility="{Binding ColumnVisibility[0]}"></DataGridTextColumn>
+                    <DataGridTemplateColumn Visibility="{Binding ColumnVisibility[1]}"> 
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image MaxHeight="20" Source="{Binding UpDownAskImage, Converter={StaticResource imageConverter}}"></Image>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Binding="{Binding Ask}" Header="Sprzedaż" Visibility="{Binding ColumnVisibility[1]}"></DataGridTextColumn>
+                    <DataGridTemplateColumn Visibility="{Binding ColumnVisibility[2]}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image MaxHeight="20" Source="{Binding UpDownMidImage, Converter={StaticResource imageConverter}}"></Image>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Binding="{Binding Mid}" Header="Średnia" Visibility="{Binding ColumnVisibility[2]}"></DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
-            <!--<UserControls:UCExchangeViewCompact HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Width="780">
-                
-            </UserControls:UCExchangeViewCompact>-->
         </Grid>
-
     </Grid>
 </Window>
