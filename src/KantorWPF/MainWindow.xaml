@@ -3,18 +3,50 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:KantorWPF"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" x:Class="KantorWPF.MainWindow"
+        xmlns:viewmodel="clr-namespace:KantorWPF.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowViewModel}"
+    x:Class="KantorWPF.MainWindow"
         mc:Ignorable="d"
+        xmlns:med="clr-namespace:System.Windows.Media"
         Style="{StaticResource MaterialDesignWindow}"
         Title="MainWindow" Height="450" Width="800">
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.15*"></RowDefinition>
-            <RowDefinition></RowDefinition>
+            <RowDefinition Height="0.15*"/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
         <Label Content="Kantor" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="24"/>
-        
+        <Grid x:Name="currenciesHolder" Grid.Row="1">
+            <Button Command="{Binding LoadCommand}" Content="Button" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <DataGrid Name="Currencies"  AutoGenerateColumns="False" ItemsSource="{Binding CurTable.Rates}" Margin="20">
+                <DataGrid.Resources>
+                    <med:ImageConverter x:Key="imageConverter" />
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image MaxHeight="20" Source="{Binding FlagImage, Converter={StaticResource imageConverter}}"></Image>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image MaxHeight="20" Source="{Binding UpDownImage, Converter={StaticResource imageConverter}}"></Image>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Binding="{Binding Code}" Header="Kod"></DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Currency}" Header="Nazwa"></DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Bid}" Header="Kupno"></DataGridTextColumn>
+                    <DataGridTextColumn Binding="{Binding Ask}" Header="Sprzedaż"></DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            <!--<UserControls:UCExchangeViewCompact HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Width="780">
+                
+            </UserControls:UCExchangeViewCompact>-->
+        </Grid>
+
     </Grid>
 </Window>

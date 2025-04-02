@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using KantorWPF.ViewModel;
+using System.Windows;
 
 namespace KantorWPF
 {
@@ -9,12 +10,9 @@ namespace KantorWPF
     {
         public MainWindow()
         {
-            LoadExchangeData();
+            MainWindowViewModel vmMainWindowViewModel = new();
+            DataContext = vmMainWindowViewModel;
             InitializeComponent();
-        }
-        public void LoadExchangeData()
-        {
-            
         }
     }
 }
