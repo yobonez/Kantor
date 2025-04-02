@@ -1,4 +1,5 @@
 ﻿using KantorLogic.models;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 
 namespace KantorLogic.api;
@@ -100,90 +101,66 @@ public class DataAccess
     }
 
     // TODO: refactoring
+    private async Task<ConcreteCurrencyValues> CCVGetter(string endpoint)
+    {
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        ConcreteCurrencyValues currencyValuesResponse = new();
+        if (response.StatusCode == HttpStatusCode.OK)
+            return await response.Content.ReadAsAsync<ConcreteCurrencyValues>();
+        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+    }
+    private async Task<List<GoldRate>> GoldGetter(string endpoint)
+    {
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        List<GoldRate> goldRatesResponse = new();
+        if (response.StatusCode == HttpStatusCode.OK)
+            return await response.Content.ReadAsAsync<List<GoldRate>>();
+        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+    }
+    private async Task<List<CurrencyTable>> CTGetterMultiple(string endpoint)
+    {
+        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
+        List<CurrencyTable> currencyTableResponse = new();
+        if (response.StatusCode == HttpStatusCode.OK)
+            return await response.Content.ReadAsAsync<List<CurrencyTable>>();
+        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+    }
+
     // single currency retrieval
     public async Task<ConcreteCurrencyValues> GetCurrencyNewest(string tableCode, string? currencyCode)
     {
         string endpoint = BuildEndpointString(tableCode, currencyCode: currencyCode);
-
-        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        ConcreteCurrencyValues currencyValuesResponse = new();
-        if (response.StatusCode == HttpStatusCode.OK)
-            currencyValuesResponse = await response.Content.ReadAsAsync<ConcreteCurrencyValues>();
-        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
-
-        return currencyValuesResponse;
+        return await CCVGetter(endpoint);
     }
     public async Task<ConcreteCurrencyValues> GetCurrencyNewestCount(string tableCode, string? currencyCode, int last)
     {
         string endpoint = BuildEndpointString(tableCode, currencyCode: currencyCode, topCount: last);
-
-        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        ConcreteCurrencyValues currencyValuesResponse = new();
-        if (response.StatusCode == HttpStatusCode.OK)
-            currencyValuesResponse = await response.Content.ReadAsAsync<ConcreteCurrencyValues>();
-        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
-
-        return currencyValuesResponse;
+        return await CCVGetter(endpoint);
     }
     public async Task<ConcreteCurrencyValues> GetCurrencyInDate(string tableCode, string? currencyCode, DateTime date)
     {
         string endpoint = BuildEndpointString(tableCode, date, currencyCode: currencyCode);
-
-        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        ConcreteCurrencyValues currencyValuesResponse = new();
-        if (response.StatusCode == HttpStatusCode.OK)
-            currencyValuesResponse = await response.Content.ReadAsAsync<ConcreteCurrencyValues>();
-        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
-
-        return currencyValuesResponse;
+        return await CCVGetter(endpoint);
     }
     public async Task<ConcreteCurrencyValues> GetCurrencyInDateRange(string tableCode, string? currencyCode, DateTime from, DateTime to)
     {
         string endpoint = BuildEndpointString(tableCode, from, to, currencyCode: currencyCode);
-
-        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        ConcreteCurrencyValues currencyValuesResponse = new();
-        if (response.StatusCode == HttpStatusCode.OK)
-            currencyValuesResponse = await response.Content.ReadAsAsync<ConcreteCurrencyValues>();
-        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
-
-        return currencyValuesResponse;
+        return await CCVGetter(endpoint);
     }
     public async Task<List<GoldRate>> GetGoldPriceNewest()
     {
         string endpoint = BuildEndpointString("gold");
-
-        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        List<GoldRate> goldRatesResponse = new();
-        if (response.StatusCode == HttpStatusCode.OK)
-            goldRatesResponse = await response.Content.ReadAsAsync<List<GoldRate>>();
-        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
-
-        return goldRatesResponse;
+        return await GoldGetter(endpoint);
     }
     public async Task<List<GoldRate>> GetGoldPriceInDate(DateTime date)
     {
         string endpoint = BuildEndpointString("gold", date);
-
-        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        List<GoldRate> goldValuesResponse = new();
-        if (response.StatusCode == HttpStatusCode.OK)
-            goldValuesResponse = await response.Content.ReadAsAsync<List<GoldRate>>();
-        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
-
-        return goldValuesResponse;
+        return await GoldGetter(endpoint);
     }
     public async Task<List<GoldRate>> GetGoldPriceInDateRange(DateTime from, DateTime to)
     {
         string endpoint = BuildEndpointString("gold", from, to);
-
-        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        List<GoldRate> goldValuesResponse = new();
-        if (response.StatusCode == HttpStatusCode.OK)
-            goldValuesResponse = await response.Content.ReadAsAsync<List<GoldRate>>();
-        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
-
-        return goldValuesResponse;
+        return await GoldGetter(endpoint);
     }
 
     // retrieval of multiple currencies
@@ -216,26 +193,14 @@ public class DataAccess
     public async Task<CurrencyTable> GetCurrencyTableInDate(string tableCode, DateTime date)
     {
         string endpoint = BuildEndpointString(tableCode, date);
-
-        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        List<CurrencyTable> currencyTableResponse = new();
-        if (response.StatusCode == HttpStatusCode.OK)
-            currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
-        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
-
-        return currencyTableResponse[0];
+        List<CurrencyTable> ctMultiple = await CTGetterMultiple(endpoint);
+        return ctMultiple[0];
     }
     public async Task<CurrencyTable> GetCurrencyTableInDateRange(string tableCode, DateTime from, DateTime to)
     {
         string endpoint = BuildEndpointString(tableCode, from, to);
-
-        HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-        List<CurrencyTable> currencyTableResponse = new();
-        if (response.StatusCode == HttpStatusCode.OK)
-            currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
-        else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
-
-        return currencyTableResponse[0];
+        List<CurrencyTable> ctMultiple = await CTGetterMultiple(endpoint);
+        return ctMultiple[0];
     }
 
     public async Task<List<CurrencyTable>> GetAllCurrencyTablesNewest()
@@ -243,12 +208,8 @@ public class DataAccess
         foreach (string tableCode in tableCodes)
         {
             string endpoint = BuildEndpointString(tableCode);
-            HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                List<CurrencyTable> currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
-                currencyTables.Add(currencyTableResponse[0]);
-            }
+            List<CurrencyTable> currencyTableResponse = await CTGetterMultiple(endpoint);
+            currencyTables.Add(currencyTableResponse[0]);
         }
 
         return currencyTables;
@@ -260,39 +221,26 @@ public class DataAccess
             try
             {
                 string endpoint = BuildEndpointString(tableCode, topCount: last);
-                HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    List<CurrencyTable> currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
-                    Console.WriteLine("tutaj program powinien iść dalej");  // tu jest git // a tu już nie, znika sobie
+                List<CurrencyTable> currencyTableResponse = await CTGetterMultiple(endpoint);
 
-                    foreach (CurrencyTable currencyTable in currencyTableResponse)
-                    { currencyTables.Add(currencyTable); }
-
-                }
-
+                foreach (CurrencyTable currencyTable in currencyTableResponse)
+                { currencyTables.Add(currencyTable); }
             }
             catch (Exception ex) { 
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine(ex.ToString()); // it would be nice to get a road for log from class lib to wpf,
+                // thats doable, but no time ig
             }
         }
 
         return currencyTables;
     }
-    //public async Task<List<Currencies>> GetAllCurrencyTablesTopCount();
     public async Task<List<CurrencyTable>> GetAllCurrencyTablesInDate(DateTime date)
     {
         foreach (string tableCode in tableCodes)
         {
             string endpoint = BuildEndpointString(tableCode, date);
-
-            HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                List<CurrencyTable> currencyTableResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
-                currencyTables.Add(currencyTableResponse[0]);
-            }
-            else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+            List<CurrencyTable> currencyTableResponse = await CTGetterMultiple(endpoint);
+            currencyTables.Add(currencyTableResponse[0]);
         }
         return currencyTables;
     }
@@ -301,15 +249,9 @@ public class DataAccess
         foreach (string tableCode in tableCodes)
         {
             string endpoint = BuildEndpointString(tableCode, from, to);
-
-            HttpResponseMessage response = await _httpClient.GetAsync(endpoint);
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                List<CurrencyTable> currencyTablesResponse = await response.Content.ReadAsAsync<List<CurrencyTable>>();
-                foreach(CurrencyTable currencyTable in currencyTablesResponse)
-                    { currencyTables.Add(currencyTable); }
-            }
-            else throw new HttpRequestException(response.ReasonPhrase + "\n" + endpoint);
+            List<CurrencyTable> currencyTablesResponse = await CTGetterMultiple(endpoint);
+            foreach(CurrencyTable currencyTable in currencyTablesResponse)
+                { currencyTables.Add(currencyTable); }
         }
         return currencyTables;
     }

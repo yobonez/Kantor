@@ -7,8 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Windows;
-using System.Windows.Navigation;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Drawing;
 
 namespace KantorWPF.ViewModel
 {
@@ -17,8 +16,8 @@ namespace KantorWPF.ViewModel
     /// </summary>
     internal class MainWindowViewModel : ViewModelBase
     {
-        private System.Drawing.Image upImage = System.Drawing.Image.FromFile("../../../images/exchange_up.png");
-        private System.Drawing.Image downImage = System.Drawing.Image.FromFile("../../../images/exchange_down.png");
+        private Image upImage = Image.FromFile("../../../images/exchange_up.png");
+        private Image downImage = Image.FromFile("../../../images/exchange_down.png");
         public RelayCommand LoadCommand => new RelayCommand(execute => LoadExchangeData());
 
         public string[] AvailableTables
@@ -49,7 +48,7 @@ namespace KantorWPF.ViewModel
         }
 
         // top 10 druciarskich kodow
-        private async Task<System.Drawing.Image> GetCurrencyFlag(string currencyCode)
+        private async Task<Image> GetCurrencyFlag(string currencyCode)
         {
             using (var httpClient = new HttpClient())
             {
@@ -65,11 +64,11 @@ namespace KantorWPF.ViewModel
                     {
                         using (MemoryStream imgStream = (MemoryStream)flagResponse.Content.ReadAsStream())
                         {
-                            System.Drawing.Image.FromStream(imgStream).Save($"{countryCode.ToLower()}.png");
-                            return System.Drawing.Image.FromFile($"{countryCode.ToLower()}.png");
+                            Image.FromStream(imgStream).Save($"{countryCode.ToLower()}.png");
+                            return Image.FromFile($"{countryCode.ToLower()}.png");
 
                             // ArgumentException ImageFormat.COKOLWIEK w Converterze
-                            //using (var objImage = System.Drawing.Image.FromStream(imgStream))
+                            //using (var objImage = Image.FromStream(imgStream))
                             //{
                             //    using (var bmp = new Bitmap(objImage))
                             //    {
@@ -84,7 +83,7 @@ namespace KantorWPF.ViewModel
             return null;
         }
 
-        private System.Drawing.Image? UpOrDown(Decimal? newValue, Decimal? oldValue)
+        private Image? UpOrDown(Decimal? newValue, Decimal? oldValue)
         {
             if (newValue > oldValue) { return upImage; }
             else { return downImage; }
@@ -111,9 +110,9 @@ namespace KantorWPF.ViewModel
                 int auxRateCount = 0;
                 foreach (CodedRate rate in tempTables[0].Rates)
                 {
-                    System.Drawing.Image flag = await GetCurrencyFlag(rate.Code);
+                    Image flag = await GetCurrencyFlag(rate.Code);
 
-                    System.Drawing.Image askUpDown = null, bidUpDown = null, midUpDown = null;
+                    Image askUpDown = null, bidUpDown = null, midUpDown = null;
                     if (TableCode == "A" || TableCode == "B") {
                         midUpDown = UpOrDown(tempTables[1].Rates[auxRateCount].Mid, rate.Mid);
                     }
