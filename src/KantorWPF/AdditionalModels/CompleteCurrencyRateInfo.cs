@@ -1,6 +1,8 @@
-﻿namespace KantorWPF.AdditionalModels
+﻿using KantorWPF.MVVM;
+
+namespace KantorWPF.AdditionalModels
 {
-    public class CompleteCurrencyRateInfo
+    class CompleteCurrencyRateInfo : ViewModelBase
     {
         public System.Drawing.Image? FlagImage { get; set; }
         public string Currency { get; set; }

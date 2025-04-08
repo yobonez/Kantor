@@ -2,9 +2,11 @@
 using KantorLogic.models;
 using KantorWPF.AdditionalModels;
 using KantorWPF.MVVM;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Windows;
 using System.Drawing;
@@ -19,17 +21,47 @@ namespace KantorWPF.ViewModel
         private Image upImage = Image.FromFile("../../../images/exchange_up.png");
         private Image downImage = Image.FromFile("../../../images/exchange_down.png");
         public RelayCommand LoadCommand => new RelayCommand(execute => LoadExchangeData());
+        //public RelayCommand SearchCommand => new RelayCommand(execute => SearchData());
 
-        public string[] AvailableTables
+        public async Task SearchData()
         {
-            get;
-        } = ["A", "B", "C"];
+            if (SearchPhrase == "Szukaj...") return;
+
+            CurTable = fallbackCurTable;
+            CompleteCurrencyTable results = new CompleteCurrencyTable();
+
+            results.No = CurTable.No;
+            results.TradingRate = CurTable.TradingRate;
+            results.EffectiveDate = CurTable.EffectiveDate;
+            results.Table = CurTable.Table;
+            results.Rates = new List<CompleteCurrencyRateInfo>();
+
+            foreach(var item in CurTable.Rates)
+            {
+                if(item.Code.ToLower().Contains(SearchPhrase.ToLower()) ||
+                   item.Currency.ToLower().Contains(SearchPhrase.ToLower()) )
+                {
+                    results.Rates.Add(item);
+                }
+            }
+
+            CurTable = results;
+        }
+
+        public string[] AvailableTables { get; } =  ["A", "B", "C"];
 
         private string tableCode;
         public string TableCode
         {
             get { return tableCode; }
             set { tableCode = value; OnPropertyChanged(); }
+        }
+
+        private string searchPhrase = "Szukaj...";
+        public string SearchPhrase
+        {
+            get { return searchPhrase; }
+            set { searchPhrase = value; OnPropertyChanged(); }
         }
 
         private Visibility[] columnVisibility = [Visibility.Collapsed, Visibility.Collapsed, Visibility.Collapsed]; // mid, bid, ask
@@ -39,6 +71,7 @@ namespace KantorWPF.ViewModel
             set { columnVisibility = value; OnPropertyChanged(); }
         }
 
+        private CompleteCurrencyTable fallbackCurTable;
         private CompleteCurrencyTable curTable = new();
         public CompleteCurrencyTable CurTable
         {
@@ -64,8 +97,10 @@ namespace KantorWPF.ViewModel
                     {
                         using (MemoryStream imgStream = (MemoryStream)flagResponse.Content.ReadAsStream())
                         {
-                            Image.FromStream(imgStream).Save($"{countryCode.ToLower()}.png");
-                            return Image.FromFile($"{countryCode.ToLower()}.png");
+                            string filename = $"{countryCode.ToLower()}.png";
+                            if (!File.Exists(filename)) 
+                                Image.FromStream(imgStream).Save(filename);
+                            return Image.FromFile(filename);
 
                             // ArgumentException ImageFormat.COKOLWIEK w Converterze
                             //using (var objImage = Image.FromStream(imgStream))
@@ -109,8 +144,7 @@ namespace KantorWPF.ViewModel
 
                 int auxRateCount = 0;
                 foreach (CodedRate rate in tempTables[0].Rates)
-                {
-                    Image flag = await GetCurrencyFlag(rate.Code);
+                { 
 
                     Image askUpDown = null, bidUpDown = null, midUpDown = null;
                     if (TableCode == "A" || TableCode == "B") {
@@ -125,7 +159,7 @@ namespace KantorWPF.ViewModel
 
                     CompleteCurrencyRateInfo toAdd = new()
                     {
-                        FlagImage = flag,
+                        FlagImage = null,
                         Code = rate.Code,
                         Currency = rate.Currency,
                         Bid = rate.Bid,
@@ -140,6 +174,15 @@ namespace KantorWPF.ViewModel
                 }
 
                 CurTable = tempCompleteCurrTable;
+                fallbackCurTable = tempCompleteCurrTable;
+
+                foreach(var rate in tempCompleteCurrTable.Rates)
+                {
+                    Image flag = await GetCurrencyFlag(rate.Code);
+                    rate.FlagImage = flag;
+                }
+                CurTable = tempCompleteCurrTable;
+                fallbackCurTable = tempCompleteCurrTable;
             }
             
             catch (Exception ex)

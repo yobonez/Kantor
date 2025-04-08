@@ -1,6 +1,8 @@
-﻿namespace KantorWPF.AdditionalModels
+﻿using KantorWPF.MVVM;
+
+namespace KantorWPF.AdditionalModels
 {
-    public class CompleteCurrencyTable
+    class CompleteCurrencyTable : ViewModelBase
     {
         public string Table { get; set; }
         public string No { get; set; }
